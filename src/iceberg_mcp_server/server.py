@@ -9,6 +9,7 @@
 ## permissions and limitations governing your use of the file.
 
 import os
+import sys
 from fastmcp import FastMCP
 from dotenv import load_dotenv
 
@@ -36,10 +37,21 @@ def get_schema() -> str:
     return impala_tools.get_schema()
 
 
+@mcp.tool()
+def get_table_health(table: str) -> str:
+    """
+    Assess Iceberg table health using metadata tables (snapshots, history, files,
+    partitions, manifests, metadata_log_entries). Returns structured JSON summaries,
+    recent activity, and health signals. Pass the table as name or database.table
+    (e.g. flights or airlines_iceberg.flights).
+    """
+    return impala_tools.get_table_health(table)
+
+
 def main():
     transport = os.getenv("MCP_TRANSPORT", "stdio")
-    print(f"Starting Iceberg MCP Server via transport: {transport}")
-    mcp.run(transport=transport)
+    print(f"Starting Iceberg MCP Server via transport: {transport}", file=sys.stderr)
+    mcp.run(transport=transport, show_banner=False)
 
 if __name__ == "__main__":
     main()

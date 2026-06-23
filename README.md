@@ -1,9 +1,35 @@
 # Cloudera Iceberg MCP Server (via Impala)
 
-This is a A Model Context Protocol server that provides read-only access to Iceberg tables via Apache Impala. This server enables LLMs to inspect database schemas and execute read-only queries.
+This is a Model Context Protocol server that provides read-only access to Iceberg tables via Apache Impala. This server enables LLMs to inspect database schemas, run read-only queries, and assess Iceberg table health from metadata tables.
 
-- `execute_query(query: str)`: Run any SQL query on Impala and return the results as JSON.
-- `get_schema()`: List all tables available in the current database.
+## Tools
+
+- `execute_query(query: str)`: Run a read-only SQL query on Impala and return results as JSON.
+- `get_schema()`: List all tables in the current database.
+- `get_table_health(table: str)`: Summarize Iceberg table health from metadata tables (`snapshots`, `history`, `files`, `partitions`, `manifests`, `metadata_log_entries`). Pass `table` or `database.table` (for example `flights` or `airlines_iceberg.flights`).
+
+## Local development
+
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+cp .env.example .env   # then edit with your Impala settings
+```
+
+Quick connectivity test:
+
+```bash
+python -c "from iceberg_mcp_server.tools import impala_tools; print(impala_tools.get_schema())"
+```
+
+Run with the MCP Inspector (use `fastmcp`, not `mcp dev`):
+
+```bash
+fastmcp dev inspector src/iceberg_mcp_server/server.py:mcp --with-editable .
+```
+
+For Cursor or other stdio clients, run `python src/iceberg_mcp_server/server.py` with the same `IMPALA_*` environment variables.
 
 ## Usage with Claude Desktop
 

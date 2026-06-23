@@ -5,9 +5,9 @@ description = "Cloudera Iceberg MCP Server via Impala"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "fastmcp>=2.9.2",
+    "fastmcp>=3.4.2",
     "impyla>=0.21.0",
-    "mcp[cli]>=1.9.4",
+    "mcp[cli]>=1.28.0",
     "python-dotenv>=1.1.0",
 ]
 
