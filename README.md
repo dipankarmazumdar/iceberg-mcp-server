@@ -1,6 +1,10 @@
-# Cloudera Iceberg MCP Server (via Impala)
+# Iceberg MCP Server (via Impala)
 
-This is a Model Context Protocol server that provides read-only access to Iceberg tables via Apache Impala. This server enables LLMs to inspect database schemas, run read-only queries, and assess Iceberg table health from metadata tables.
+Fork of [cloudera/iceberg-mcp-server](https://github.com/cloudera/iceberg-mcp-server) with Iceberg **table health** tooling and Impala reliability improvements.
+
+Model Context Protocol server for read-only access to Iceberg tables through Apache Impala: schema discovery, SQL queries, and metadata-based health checks.
+
+**Maintained fork:** `https://github.com/dipankarmazumdar/iceberg-mcp-server`
 
 ## Tools
 
@@ -29,13 +33,35 @@ Run with the MCP Inspector (use `fastmcp`, not `mcp dev`):
 fastmcp dev inspector src/iceberg_mcp_server/server.py:mcp --with-editable .
 ```
 
-For Cursor or other stdio clients, run `python src/iceberg_mcp_server/server.py` with the same `IMPALA_*` environment variables.
+## Usage with Cursor
+
+Open this repository in Cursor. Project MCP config lives in `.cursor/mcp.json` (or copy from `mcp.json.example`).
+
+Minimal config:
+
+```json
+{
+  "mcpServers": {
+    "iceberg-mcp-server": {
+      "command": "/path/to/iceberg-mcp-server/.venv/bin/python",
+      "args": [
+        "/path/to/iceberg-mcp-server/src/iceberg_mcp_server/server.py"
+      ]
+    }
+  }
+}
+```
+
+Use **Agent** mode in chat. Credentials can live in `.env` (loaded by the server) or in the `env` block of the MCP config.
+
+Enable the server under **Cursor Settings → MCP**.
 
 ## Usage with Claude Desktop
 
-To use this server with the Claude Desktop app, add the following configuration to the "mcpServers" section of your `claude_desktop_config.json`:
+Add to the `mcpServers` section of your `claude_desktop_config.json`.
 
-### Option 1: Direct installation from GitHub (Recommended)
+### Option 1: Install from this fork (recommended)
+
 ```json
 {
   "mcpServers": {
@@ -43,7 +69,7 @@ To use this server with the Claude Desktop app, add the following configuration 
       "command": "uvx",
       "args": [
         "--from",
-        "git+https://github.com/cloudera/iceberg-mcp-server@main",
+        "git+https://github.com/dipankarmazumdar/iceberg-mcp-server@main",
         "run-server"
       ],
       "env": {
@@ -58,7 +84,8 @@ To use this server with the Claude Desktop app, add the following configuration 
 }
 ```
 
-### Option 2: Local installation (after cloning the repository)
+### Option 2: Local installation (after cloning this repository)
+
 ```json
 {
   "mcpServers": {
@@ -82,18 +109,26 @@ To use this server with the Claude Desktop app, add the following configuration 
 }
 ```
 
-For Option 2, replace `/path/to` with your path to this repository. Set the environment variables according to your Impala configuration.
+For Option 2, replace `/path/to` with your clone path.
+
+### Upstream (Cloudera, without fork features)
+
+The original project is [cloudera/iceberg-mcp-server](https://github.com/cloudera/iceberg-mcp-server). It does not include `get_table_health` or the Impala metadata fixes in this fork.
 
 ## Usage with AI frameworks
 
-The `./examples` folder contains several examples how to integrate this MCP Server with common AI Frameworks like LangChain/LangGraph, OpenAI SDK.
+The `./examples` folder contains examples for LangChain/LangGraph and OpenAI SDK.
 
 ### Transport
 
-The MCP server's transport protocol is configurable via the `MCP_TRANSPORT` environment variable. Supported values:
-- `stdio` **(default)** — communicate over standard input/output. Useful for local tools, command-line scripts, and integrations with clients like Claude Desktop.
-- `http` - expose an HTTP server. Useful for web-based deployments, microservices, exposing MCP over a network.
-- `sse` — use Server-Sent Events (SSE) transport. Useful for existing web-based deployments that rely on SSE.
+Configure via `MCP_TRANSPORT`:
 
+- `stdio` **(default)** — Claude Desktop, Cursor, Inspector
+- `http` — network HTTP deployment
+- `sse` — Server-Sent Events
 
-*Copyright (c) 2025 - Cloudera, Inc. All rights reserved.*
+---
+
+Based on [cloudera/iceberg-mcp-server](https://github.com/cloudera/iceberg-mcp-server). See `LICENSE` and `NOTICE.txt` for attribution.
+
+*Copyright (c) 2025 Cloudera, Inc. All rights reserved.*
