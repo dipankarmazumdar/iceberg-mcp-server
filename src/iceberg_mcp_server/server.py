@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from iceberg_mcp_server.tools import impala_tools
+from iceberg_mcp_server.tools import iceberg_semantics
 
 mcp = FastMCP(name="Cloudera Iceberg MCP Server via Impala")
 
@@ -46,6 +47,102 @@ def get_table_health(table: str) -> str:
     (e.g. flights or airlines_iceberg.flights).
     """
     return impala_tools.get_table_health(table)
+
+
+@mcp.tool()
+def list_metadata_tables(table: str) -> str:
+    """
+    List Iceberg metadata tables available for a table (SHOW METADATA TABLES).
+    Pass table or database.table (e.g. flights or airlines_iceberg.flights).
+    """
+    return iceberg_semantics.list_metadata_tables(table)
+
+
+@mcp.tool()
+def describe_metadata_table(table: str, metadata_name: str) -> str:
+    """
+    Describe the schema of an Iceberg metadata table (e.g. snapshots, files, refs).
+    """
+    return iceberg_semantics.describe_metadata_table(table, metadata_name)
+
+
+@mcp.tool()
+def query_metadata_table(
+    table: str,
+    metadata_name: str,
+    limit: int = 100,
+    columns: str | None = None,
+) -> str:
+    """
+    Query an Iceberg metadata table with a safe row limit. Optional comma-separated columns.
+    """
+    return iceberg_semantics.query_metadata_table(table, metadata_name, limit, columns)
+
+
+@mcp.tool()
+def list_snapshots(table: str, limit: int = 50) -> str:
+    """
+    List Iceberg snapshots for a table ordered by committed_at (most recent first).
+    """
+    return iceberg_semantics.list_snapshots(table, limit)
+
+
+@mcp.tool()
+def describe_table_history(table: str) -> str:
+    """
+    List snapshot history via Impala DESCRIBE HISTORY for an Iceberg table.
+    """
+    return iceberg_semantics.describe_table_history(table)
+
+
+@mcp.tool()
+def get_snapshot_summary(table: str, snapshot_id: str) -> str:
+    """
+    Get metadata for a single Iceberg snapshot ID including parsed summary stats.
+    """
+    return iceberg_semantics.get_snapshot_summary(table, snapshot_id)
+
+
+@mcp.tool()
+def list_refs(table: str) -> str:
+    """
+    List Iceberg branches and tags from the refs metadata table.
+    """
+    return iceberg_semantics.list_refs(table)
+
+
+@mcp.tool()
+def query_at_snapshot(
+    table: str,
+    snapshot_id: str,
+    limit: int = 100,
+    columns: str | None = None,
+) -> str:
+    """
+    Time-travel read using FOR SYSTEM_VERSION AS OF snapshot_id. Optional column list and limit.
+    """
+    return iceberg_semantics.query_at_snapshot(table, snapshot_id, limit, columns)
+
+
+@mcp.tool()
+def query_at_timestamp(
+    table: str,
+    timestamp: str,
+    limit: int = 100,
+    columns: str | None = None,
+) -> str:
+    """
+    Time-travel read using FOR SYSTEM_TIME AS OF timestamp (e.g. '2024-07-18 10:12:20').
+    """
+    return iceberg_semantics.query_at_timestamp(table, timestamp, limit, columns)
+
+
+@mcp.tool()
+def diff_snapshots(table: str, snapshot_id_a: str, snapshot_id_b: str) -> str:
+    """
+    Compare two Iceberg snapshots by ID and return metadata and summary diffs.
+    """
+    return iceberg_semantics.diff_snapshots(table, snapshot_id_a, snapshot_id_b)
 
 
 def main():

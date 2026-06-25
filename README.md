@@ -12,6 +12,19 @@ Model Context Protocol server for read-only access to Iceberg tables through Apa
 - `get_schema()`: List all tables in the current database.
 - `get_table_health(table: str)`: Summarize Iceberg table health from metadata tables (`snapshots`, `history`, `files`, `partitions`, `manifests`, `metadata_log_entries`). Pass `table` or `database.table` (for example `flights` or `airlines_iceberg.flights`).
 
+### Iceberg semantics
+
+- `list_metadata_tables(table)`: List metadata tables (`snapshots`, `files`, `refs`, etc.).
+- `describe_metadata_table(table, metadata_name)`: Schema of a metadata table.
+- `query_metadata_table(table, metadata_name, limit?, columns?)`: Bounded metadata query.
+- `list_snapshots(table, limit?)`: Snapshot timeline from metadata.
+- `describe_table_history(table)`: Snapshot history via `DESCRIBE HISTORY`.
+- `get_snapshot_summary(table, snapshot_id)`: Detail for one snapshot.
+- `list_refs(table)`: Branches and tags.
+- `query_at_snapshot(table, snapshot_id, limit?, columns?)`: Time travel by snapshot ID.
+- `query_at_timestamp(table, timestamp, limit?, columns?)`: Time travel by timestamp.
+- `diff_snapshots(table, snapshot_id_a, snapshot_id_b)`: Compare two snapshots.
+
 ## Local development
 
 ```bash
