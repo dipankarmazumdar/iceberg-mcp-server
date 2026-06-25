@@ -17,6 +17,7 @@ load_dotenv()
 
 from iceberg_mcp_server.tools import impala_tools
 from iceberg_mcp_server.tools import iceberg_semantics
+from iceberg_mcp_server.tools import performance_tools
 
 mcp = FastMCP(name="Cloudera Iceberg MCP Server via Impala")
 
@@ -143,6 +144,38 @@ def diff_snapshots(table: str, snapshot_id_a: str, snapshot_id_b: str) -> str:
     Compare two Iceberg snapshots by ID and return metadata and summary diffs.
     """
     return iceberg_semantics.diff_snapshots(table, snapshot_id_a, snapshot_id_b)
+
+
+@mcp.tool()
+def explain_query(query: str) -> str:
+    """
+    Return the Impala EXPLAIN plan for a read-only SELECT or WITH query.
+    """
+    return performance_tools.explain_query(query)
+
+
+@mcp.tool()
+def partition_pruning_check(query: str) -> str:
+    """
+    EXPLAIN a read-only query and heuristically assess whether partition pruning is likely.
+    """
+    return performance_tools.partition_pruning_check(query)
+
+
+@mcp.tool()
+def table_scan_cost_hints(table: str) -> str:
+    """
+    Estimate full-scan cost signals from Iceberg files/partitions metadata for a table.
+    """
+    return performance_tools.table_scan_cost_hints(table)
+
+
+@mcp.tool()
+def hot_partitions(table: str, limit: int = 20) -> str:
+    """
+    List the hottest Iceberg partitions by file count and record count to detect skew.
+    """
+    return performance_tools.hot_partitions(table, limit)
 
 
 def main():

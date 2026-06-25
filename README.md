@@ -25,6 +25,13 @@ Model Context Protocol server for read-only access to Iceberg tables through Apa
 - `query_at_timestamp(table, timestamp, limit?, columns?)`: Time travel by timestamp.
 - `diff_snapshots(table, snapshot_id_a, snapshot_id_b)`: Compare two snapshots.
 
+### Performance & cost awareness
+
+- `explain_query(query)`: Impala EXPLAIN plan for a read-only query.
+- `partition_pruning_check(query)`: Heuristic partition pruning assessment from EXPLAIN.
+- `table_scan_cost_hints(table)`: Scan cost signals from files/partitions metadata.
+- `hot_partitions(table, limit?)`: Top partitions by file/record count (skew detection).
+
 ## Local development
 
 ```bash

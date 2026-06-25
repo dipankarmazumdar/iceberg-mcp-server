@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "iceberg-mcp-server": {
+      "command": "/path/to/iceberg-mcp-server/.venv/bin/python",
+      "args": [
+        "/path/to/iceberg-mcp-server/src/iceberg_mcp_server/server.py"
+      ],
+      "env": {
+        "IMPALA_HOST": "coordinator-default-impala.example.com",
+        "IMPALA_PORT": "443",
+        "IMPALA_USER": "username",
+        "IMPALA_PASSWORD": "password",
+        "IMPALA_DATABASE": "default"
+      }
+    }
+  }
+}
